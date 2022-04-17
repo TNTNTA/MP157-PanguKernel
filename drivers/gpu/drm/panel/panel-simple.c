@@ -37,6 +37,8 @@
 #include <drm/drm_device.h>
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_panel.h>
+#include <linux/of_device.h>
+#include <linux/of_gpio.h>
 
 /**
  * @modes: Pointer to array of fixed modes appropriate for this panel.  If
@@ -94,6 +96,14 @@ struct panel_desc {
 
 	u32 bus_format;
 	u32 bus_flags;
+};
+
+enum alientek_lcd_select {
+    alientek_4x3_480x272 = 0,
+    alientek_7_800x480,
+    alientek_7_1024x600,
+    alientek_4x3_800x480 = 4,
+    alientek_10_1280x800,
 };
 
 struct panel_simple {
@@ -417,7 +427,7 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 	struct panel_simple *panel;
 	struct display_timing dt;
 	int err;
-
+	dev_err(dev, "tangtao panel_simple_probe sstart\n");
 	panel = devm_kzalloc(dev, sizeof(*panel), GFP_KERNEL);
 	if (!panel)
 		return -ENOMEM;
@@ -473,7 +483,7 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 		goto free_ddc;
 
 	dev_set_drvdata(dev, panel);
-
+	dev_err(dev, "tangtao panel_simple_probe end\n");
 	return 0;
 
 free_ddc:
@@ -3108,6 +3118,108 @@ static const struct panel_desc arm_rtsm = {
 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
 };
 
+static const struct drm_display_mode alientek_4x3_480x272_mode = {
+       .clock = 9000,
+       .hdisplay = 480,
+       .hsync_start = 480 + 40,
+       .hsync_end = 480 + 40 + 1,
+       .htotal = 480 + 40 + 1 + 5,
+       .vdisplay = 272,
+       .vsync_start = 272 + 8,
+       .vsync_end = 272 + 8 + 1,
+       .vtotal = 272 + 8 + 1 + 8,
+       .vrefresh = 60,
+       .flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+};
+
+static const struct panel_desc alientek_4x3_480x272_desc = {
+       .modes = &alientek_4x3_480x272_mode,
+       .num_modes = 1,
+       .bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
+static const struct drm_display_mode alientek_7_800x480_mode = {
+       .clock = 33300,
+       .hdisplay = 800,
+       .hsync_start = 800 + 46,
+       .hsync_end = 800 + 46 + 2,
+       .htotal = 800 + 46 + 2 + 210,
+       .vdisplay = 480,
+       .vsync_start = 480 + 23,
+       .vsync_end = 480 + 23 + 2,
+       .vtotal = 480 + 23 + 2 + 22,
+       .vrefresh = 60,
+       .flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+};
+
+static const struct panel_desc alientek_7_800x480_desc = {
+       .modes = &alientek_7_800x480_mode,
+       .num_modes = 1,
+       .bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
+static const struct drm_display_mode alientek_4x3_800x480_mode = {
+       .clock = 33300,
+       .hdisplay = 800,
+       .hsync_start = 800 + 88,
+       .hsync_end = 800 + 88 + 48,
+       .htotal = 800 + 88 + 48 + 40,
+       .vdisplay = 480,
+       .vsync_start = 480 + 32,
+       .vsync_end = 480 + 32 + 3,
+       .vtotal = 480 + 32 + 3 + 13,
+       .vrefresh = 60,
+       .flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+};
+
+static const struct panel_desc alientek_4x3_800x480_desc = {
+       .modes = &alientek_4x3_800x480_mode,
+       .num_modes = 1,
+       .bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
+static const struct drm_display_mode alientek_7_1024x600_mode = {
+       .clock = 51200,
+       .hdisplay = 1024,
+       .hsync_start = 1024 + 140,
+       .hsync_end = 1024 + 140 + 20,
+       .htotal = 1024 + 140 + 20 + 160,
+       .vdisplay = 600,
+       .vsync_start = 600 + 20,
+       .vsync_end = 600 + 20 + 3,
+       .vtotal = 600 + 20 + 3 + 12,
+       .vrefresh = 60,
+       .flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+};
+
+static const struct panel_desc alientek_7_1024x600_desc = {
+       .modes = &alientek_7_1024x600_mode,
+       .num_modes = 1,
+       .bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
+
+static const struct drm_display_mode alientek_10_1280x800_mode = {
+       .clock = 91100,
+       .hdisplay = 1280,
+       .hsync_start = 1280 + 80,
+       .hsync_end = 1280 + 80 + 10,
+       .htotal = 1280 + 80 + 10 + 70,
+       .vdisplay = 800,
+       .vsync_start = 800 + 10,
+       .vsync_end = 800 + 10 + 3,
+       .vtotal = 800 + 10 + 3 + 10,
+       .vrefresh = 70,
+       .flags = DRM_MODE_FLAG_PHSYNC & DRM_MODE_FLAG_PVSYNC ,
+};
+
+static const struct panel_desc alientek_10_1280x800_desc = {
+       .modes = &alientek_10_1280x800_mode,
+       .num_modes = 1,
+       .bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+};
+
+
 static const struct of_device_id platform_of_match[] = {
 	{
 		.compatible = "ampire,am-480272h3tmqw-t01h",
@@ -3437,6 +3549,8 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "winstar,wf35ltiacd",
 		.data = &winstar_wf35ltiacd,
 	}, {
+		.compatible = "alientek,lcd-rgb",
+	}, {
 		/* sentinel */
 	}
 };
@@ -3444,13 +3558,67 @@ MODULE_DEVICE_TABLE(of, platform_of_match);
 
 static int panel_simple_platform_probe(struct platform_device *pdev)
 {
+#if 0
 	const struct of_device_id *id;
 
 	id = of_match_node(platform_of_match, pdev->dev.of_node);
 	if (!id)
 		return -ENODEV;
 
+
 	return panel_simple_probe(&pdev->dev, id->data);
+#else
+    struct device_node *np = NULL;
+    int err;
+    u32 tmp;
+	int blgpios, ret;
+	const struct panel_desc * lcd_desc = NULL;
+    np = of_find_node_by_name( NULL, "lcd_id");
+
+    err = of_property_read_u32(np,"select_id",&tmp);
+	if(err < 0) 
+		return -ENODEV;
+
+	blgpios = of_get_named_gpio(np, "bl-gpios", 0);
+	if (!gpio_is_valid(blgpios)) {
+		ret = blgpios;
+		printk("tangtao cannot get named GPIO bl-gpios, ret=%d", ret);
+		return ret;
+	}
+	ret = devm_gpio_request(&pdev->dev, blgpios, "bl-gpios");
+	if (ret < 0) {
+		printk("tangtao cannot request GPIO bl-gpios, ret=%d", ret);
+		return ret;
+	}
+	ret = gpio_direction_output(blgpios, 1);
+	if (ret < 0) {
+		printk("tangtao cannot set GPIO bl-gpios output, ret=%d", ret);
+		return ret;
+	}
+	printk("tangtao bl-gpios=%d select_id = %d", blgpios, tmp);
+
+    switch(tmp){
+    case alientek_4x3_480x272 :
+        lcd_desc = &alientek_4x3_480x272_desc;
+        break;
+    case alientek_7_800x480 :
+        lcd_desc = &alientek_7_800x480_desc;
+        break;
+    case alientek_4x3_800x480 :
+        lcd_desc = &alientek_4x3_800x480_desc;
+        break;
+    case alientek_7_1024x600 :
+        lcd_desc = &alientek_7_1024x600_desc;
+        break;
+    case alientek_10_1280x800 :
+        lcd_desc = &alientek_10_1280x800_desc;
+        break;
+    default :
+        break;
+    }
+        lcd_desc = &alientek_4x3_800x480_desc;
+	return panel_simple_probe(&pdev->dev, lcd_desc);
+#endif
 }
 
 static int panel_simple_platform_remove(struct platform_device *pdev)
@@ -3636,6 +3804,7 @@ static const struct drm_display_mode lg_acx467akm_7_mode = {
 	.vtotal = 1920 + 2 + 2 + 2,
 	.vrefresh = 60,
 };
+
 
 static const struct panel_desc_dsi lg_acx467akm_7 = {
 	.desc = {

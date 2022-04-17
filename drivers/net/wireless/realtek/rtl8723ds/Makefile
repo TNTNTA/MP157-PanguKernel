@@ -41,8 +41,8 @@ CONFIG_RTL8822B = n
 CONFIG_RTL8723D = y
 CONFIG_RTL8821C = n
 ######################### Interface ###########################
-CONFIG_USB_HCI = n
-CONFIG_SDIO_HCI = y
+CONFIG_USB_HCI = y
+CONFIG_SDIO_HCI = n
 CONFIG_GSPI_HCI = n
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y

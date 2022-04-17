@@ -1,9 +1,8 @@
 #!/bin/sh
-make distclean
-make stm32mp1_atk_defconfig
-make menuconfig
+#make distclean
+#make pangu_stm32mp1_defconfig
 make uImage dtbs LOADADDR=0XC2000040 -j16
-
+#make modules -j8
 
 cp arch/arm/boot/uImage /home/tangtao/work/tftp -rf
 cp arch/arm/boot/dts/stm32mp157d-atk.dtb /home/tangtao/work/tftp -rf

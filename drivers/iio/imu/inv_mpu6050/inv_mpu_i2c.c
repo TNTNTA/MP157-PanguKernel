@@ -84,6 +84,8 @@ static int inv_mpu_probe(struct i2c_client *client,
 	struct regmap *regmap;
 	const char *name;
 
+	dev_err(&client->dev, "tangtao inv_mpu_probe start\n");
+
 	if (!i2c_check_functionality(client->adapter,
 				     I2C_FUNC_SMBUS_I2C_BLOCK))
 		return -EOPNOTSUPP;
@@ -139,7 +141,7 @@ static int inv_mpu_probe(struct i2c_client *client,
 			goto out_del_mux;
 		break;
 	}
-
+	dev_err(&client->dev, "tangtao inv_mpu_probe end\n");
 	return 0;
 
 out_del_mux:
